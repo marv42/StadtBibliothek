@@ -1,6 +1,6 @@
 import re
 import subprocess
-from datetime import date, timedelta
+from datetime import timedelta, datetime
 
 import requests
 from bs4 import BeautifulSoup
@@ -28,17 +28,17 @@ def get_books(html):
 def get_first_date(books):
     match = re.search(r'\d{2}\.\d{2}\.\d{4}', str(books))
     if match:
-        return match.group(0)
+        return datetime.strptime(match.group(0), "%d.%m.%Y")
     return None
 
 
 def is_in_less_than_x_days(date_in_question, x):
-    today = date.today()
+    today = datetime.today()
     return today + timedelta(days=x) > date_in_question
 
 
 html = get_html()
-parsed_html = BeautifulSoup(html)
+parsed_html = BeautifulSoup(html, 'lxml')
 books = get_books(parsed_html)
 first_date = get_first_date(books)
 
