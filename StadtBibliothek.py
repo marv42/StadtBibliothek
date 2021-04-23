@@ -67,10 +67,10 @@ def is_in_less_than_x_days(date_in_question, x):
     return today + timedelta(days=x) > date_in_question
 
 
-def send_mail():
-    command = ["mail", "-s", "Bücher laufen ab", MAIL_ADDRESS]
+def send_mail(subject, body=''):
+    command = ["mail", "-s", subject, MAIL_ADDRESS]
     process = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = process.communicate(f"... in weniger als {WARN_DAYS_IN_ADVANCE} Tagen".encode())
+    stdout, stderr = process.communicate(body.encode())
     return_code = process.returncode
     if return_code != 0:
         logging.error(f"Error sending mail: return code: {return_code}, stderr: {stderr}")
@@ -83,7 +83,7 @@ def main():
     books = get_books(parsed_html)
     first_date = get_first_date(books)
     if first_date and is_in_less_than_x_days(first_date, WARN_DAYS_IN_ADVANCE):
-        send_mail()
+        send_mail("Bücher laufen ab", f"... am {first_date.strftime('%d. %B')} (in weniger als {WARN_DAYS_IN_ADVANCE} Tagen)")
 
 
 if __name__ == "__main__":
