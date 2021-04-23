@@ -2,7 +2,7 @@ import logging
 from logging import DEBUG
 import pickle
 import re
-import subprocess
+from subprocess import Popen, PIPE
 from datetime import timedelta, datetime
 
 import requests
@@ -67,15 +67,23 @@ def is_in_less_than_x_days(date_in_question, x):
     return today + timedelta(days=x) > date_in_question
 
 
+def send_mail():
+    command = ["mail", "-s", "Bücher laufen ab", MAIL_ADDRESS]
+    process = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate(f"... in weniger als {WARN_DAYS_IN_ADVANCE} Tagen".encode())
+    return_code = process.returncode
+    if return_code != 0:
+        logging.error(f"Error sending mail: return code: {return_code}, stderr: {stderr}")
+
+
 def main():
-    logging.basicConfig(level=DEBUG)
+    # logging.basicConfig(level=DEBUG)
     html = get_html()
     parsed_html = BeautifulSoup(html, 'lxml')
     books = get_books(parsed_html)
     first_date = get_first_date(books)
-
     if first_date and is_in_less_than_x_days(first_date, WARN_DAYS_IN_ADVANCE):
-        subprocess.run(["mail", "-s", f"Bücher laufen in weniger als {WARN_DAYS_IN_ADVANCE} Tagen ab", MAIL_ADDRESS])
+        send_mail()
 
 
 if __name__ == "__main__":
