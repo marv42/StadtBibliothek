@@ -83,7 +83,7 @@ def main():
     books = get_books(parsed_html)
     first_date = get_first_date(books)
     if first_date and is_in_less_than_x_days(first_date, WARN_DAYS_IN_ADVANCE):
-        send_mail("Bücher laufen ab", f"... am {first_date.strftime('%d. %B')} (in weniger als {WARN_DAYS_IN_ADVANCE} Tagen)")
+        send_mail("Bücher laufen ab", f"... am {first_date.strftime('%d. %B')} (in weniger als {WARN_DAYS_IN_ADVANCE} Tagen).\nZum Verlängern: http://opac.st-ingbert.de/webopac/index.asp?kontofenster=start")
 
 
 if __name__ == "__main__":
