@@ -122,11 +122,11 @@ def extend():
 
 
 def main():
-    # logging.basicConfig(level=DEBUG)
+    logging.basicConfig(level=DEBUG)
     books = get_books()
     first_date = get_first_date(books)
     if first_date and is_in_less_than_x_days(first_date, WARN_DAYS_IN_ADVANCE):
-        mail_body = f"... am {first_date.strftime('%d. %m.')} (in weniger als {WARN_DAYS_IN_ADVANCE} Tagen).\n(Zum Verlängern: http://opac.st-ingbert.de/webopac/index.asp?kontofenster=start\n\n)"
+        mail_body = f"... am {first_date.strftime('%d.%m.')} (in weniger als {WARN_DAYS_IN_ADVANCE} Tagen).\n(Zum Verlängern: http://opac.st-ingbert.de/webopac/index.asp?kontofenster=start)\n\n"
         extend_result = extend_books(books, books[0][2])
         send_mail("Bücher laufen ab", mail_body + extend_result)
 
