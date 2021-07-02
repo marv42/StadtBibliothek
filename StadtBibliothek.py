@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import logging
 from logging import DEBUG
 import pickle
@@ -9,7 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 from LoginData import CARD_NUMBER, PASSWORD, MAIL_ADDRESS
 
-WARN_DAYS_IN_ADVANCE = 7
+WARN_DAYS_IN_ADVANCE = 3
 OPAC_URL = "http://opac.st-ingbert.de/webopac/index.asp"
 DATA = {'kontofenster': 'true',
         'AUSWEIS': CARD_NUMBER,
@@ -38,7 +40,7 @@ def handle_cookies():
     logging.info(f"{len(cookies)} cookies")
     result = requests.post(OPAC_URL, data=data, cookies=cookies)
     add_new_cookies(cookies, result.cookies)
-    save_cookies(cookies)
+    save_cookies(cookies)  # TODO Stop growing the cookies file indefinitely
     logging.debug(cookies)
     return cookies
 
