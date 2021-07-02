@@ -2,7 +2,6 @@
 
 import logging
 from logging import DEBUG
-import pickle
 import re
 from subprocess import Popen, PIPE
 from datetime import timedelta, datetime
@@ -18,7 +17,12 @@ DATA = {'kontofenster': 'true',
         'PWD': PASSWORD,
         'B1': '%A0%A0%A0Weiter%A0%A0%A0',
         'type': 'K'}
-COOKIES_FILE = "cookies.pickle"
+
+
+def post_request(target, cookies):
+    data = get_data_with_target(target)
+    result = requests.post(OPAC_URL, data=data, cookies=cookies)
+    return result
 
 
 def get_data_with_target(target):
@@ -28,37 +32,13 @@ def get_data_with_target(target):
 
 
 def get_html():
-    cookies = handle_cookies()
-    data = get_data_with_target('konto')
-    result = requests.post(OPAC_URL, data=data, cookies=cookies)
+    result = post_request('konto', get_cookies())
     return result.text
 
 
-def handle_cookies():
-    cookies = load_cookies()
-    data = get_data_with_target('konto')
-    logging.info(f"{len(cookies)} cookies")
-    result = requests.post(OPAC_URL, data=data, cookies=cookies)
-    add_new_cookies(cookies, result.cookies)
-    save_cookies(cookies)  # TODO Stop growing the cookies file indefinitely
-    logging.debug(cookies)
-    return cookies
-
-
-def load_cookies():
-    with open(COOKIES_FILE, 'rb') as f:
-        return pickle.load(f)
-
-
-def save_cookies(cookies):
-    with open(COOKIES_FILE, 'wb') as f:
-        pickle.dump(cookies, f)
-
-
-def add_new_cookies(cookies, result_cookies):
-    new_cookies = result_cookies.items()
-    for cookie in new_cookies:
-        cookies[cookie[0]] = cookie[1]
+def get_cookies():
+    result = post_request('konto', {})
+    return result.cookies
 
 
 def get_books():
@@ -120,11 +100,9 @@ def get_name_and_author(book):
 
 
 def extend():
-    cookies = load_cookies()
-    data = get_data_with_target('verl_1')
-    requests.post(OPAC_URL, data=data, cookies=cookies)
-    data = get_data_with_target('make_vl')
-    requests.post(OPAC_URL, data=data, cookies=cookies)
+    cookies = get_cookies()
+    post_request('verl_1', cookies)
+    post_request('make_vl', cookies)
 
 
 def list_books(books):
@@ -141,8 +119,8 @@ def main():
     if first_date and is_in_less_than_x_days(first_date, WARN_DAYS_IN_ADVANCE):
         mail_body = f"... am {first_date.strftime('%d.%m.')} (in weniger als {WARN_DAYS_IN_ADVANCE} Tagen).\n" \
                     f"(Zum Verlängern: http://opac.st-ingbert.de/webopac/index.asp?kontofenster=start)\n\n"
-        mail_body += extend_books(books, books[0][2]) + "\n"
-        mail_body += list_books(books)
+        mail_body += list_books(books) + "\n"
+        mail_body += extend_books(books, books[0][2])
         send_mail("Bücher laufen ab", mail_body)
 
 
