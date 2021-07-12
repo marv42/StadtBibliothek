@@ -18,8 +18,10 @@ DATA = {'kontofenster': 'true',
         'B1': '%A0%A0%A0Weiter%A0%A0%A0',
         'type': 'K'}
 
+cookies = {}
 
-def post_request(target, cookies):
+
+def post_request(target):
     data = get_data_with_target(target)
     result = requests.post(OPAC_URL, data=data, cookies=cookies)
     return result
@@ -32,13 +34,14 @@ def get_data_with_target(target):
 
 
 def get_html():
-    result = post_request('konto', get_cookies())
+    result = post_request('konto')
     return result.text
 
 
-def get_cookies():
-    result = post_request('konto', {})
-    return result.cookies
+def retrieve_cookies():
+    result = post_request('konto')
+    global cookies
+    cookies = result.cookies
 
 
 def get_books():
@@ -100,9 +103,8 @@ def get_name_and_author(book):
 
 
 def extend():
-    cookies = get_cookies()
-    post_request('verl_1', cookies)
-    post_request('make_vl', cookies)
+    post_request('verl_1')
+    post_request('make_vl')
 
 
 def list_books(books):
@@ -114,6 +116,7 @@ def list_books(books):
 
 def main():
     logging.basicConfig(level=DEBUG)
+    retrieve_cookies()
     books = get_books()
     first_date = get_first_date(books)
     if first_date and is_in_less_than_x_days(first_date, WARN_DAYS_IN_ADVANCE):
