@@ -111,6 +111,7 @@ def list_books(books):
     book_list = "Alle Bücher:\n"
     for book in books:
         book_list += book[2] + ": " + get_name_and_author(book) + "\n"
+    book_list += str(len(books)) + " Bücher\n"
     return book_list
 
 
