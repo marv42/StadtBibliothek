@@ -54,7 +54,7 @@ def get_books():
         match = re.search(r'>(.*)</td>', str(td))
         content = match.group(1)
         one_book.append(content)
-        if "a href" in content:
+        if len(one_book) == 4:
             list_of_books.append(one_book)
             one_book = []
     return list_of_books
