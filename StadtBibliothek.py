@@ -81,18 +81,19 @@ def send_mail(subject, body=''):
         logging.error(f"Error sending mail: return code: {return_code}, stderr: {stderr}")
 
 
-def extend_books(books, end_date):
+def extend_books(books):
     result = ""
-    for book in books:
-        if book[2] == end_date:
-            result += try_extend_book(book)
+    for b in range(len(books)):
+        day_of_book = get_first_date(books[b])
+        if is_in_less_than_x_days(day_of_book, WARN_DAYS_IN_ADVANCE):
+            result += try_extend_book(books[b], b + 1)
     return result
 
 
-def try_extend_book(book):
+def try_extend_book(book, number_of_book):
     name_and_author = get_name_and_author(book)
     if "Verlängern" in book[3]:
-        extend()
+        extend(number_of_book)
         return f"Erfolgreich verlängert: {name_and_author}\n"
     else:
         return f"Konnte nicht mehr verlängert werden: {name_and_author}. ABGEBEN!\n"
@@ -102,8 +103,8 @@ def get_name_and_author(book):
     return f"{book[1]} ({book[0]})"
 
 
-def extend():
-    post_request('verl_1')
+def extend(number_of_book):
+    post_request(f"verl_{number_of_book}")
     post_request('make_vl')
 
 
@@ -124,7 +125,7 @@ def main():
         mail_body = f"... am {first_date.strftime('%d.%m.')} (in weniger als {WARN_DAYS_IN_ADVANCE} Tagen).\n" \
                     f"(Zum Verlängern: http://opac.st-ingbert.de/webopac/index.asp?kontofenster=start)\n\n"
         mail_body += list_books(books) + "\n"
-        mail_body += extend_books(books, books[0][2])
+        mail_body += extend_books(books)
         send_mail("Bücher laufen ab", mail_body)
 
 
