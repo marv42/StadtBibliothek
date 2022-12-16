@@ -17,6 +17,7 @@ DATA = {'kontofenster': 'true',
         'PWD': PASSWORD,
         'B1': '%A0%A0%A0Weiter%A0%A0%A0',
         'type': 'K'}
+EXTEND_SUCCESS = "Erfolgreich verlängert"
 
 cookies = {}
 
@@ -82,11 +83,19 @@ def send_mail(subject, body=''):
 
 
 def extend_books(books):
-    result = ""
+    return extend_books_with_new_list_of_books(books, "")
+
+
+def extend_books_with_new_list_of_books(books, result):
     for b in range(len(books)):
         day_of_book = get_first_date(books[b])
         if is_in_less_than_x_days(day_of_book, WARN_DAYS_IN_ADVANCE):
-            result += try_extend_book(books[b], b + 1)
+            extend_result = try_extend_book(books[b], b + 1)
+            result += extend_result
+            if extend_result.startswith(EXTEND_SUCCESS):
+                books = get_books()
+                extend_books_with_new_list_of_books(books, result)
+                break
     return result
 
 
@@ -94,7 +103,7 @@ def try_extend_book(book, number_of_book):
     name_and_author = get_name_and_author(book)
     if "Verlängern" in book[3]:
         extend(number_of_book)
-        return f"Erfolgreich verlängert: {name_and_author}\n"
+        return f"{EXTEND_SUCCESS}: {name_and_author}\n"
     else:
         return f"Konnte nicht mehr verlängert werden: {name_and_author}. ABGEBEN!\n"
 
