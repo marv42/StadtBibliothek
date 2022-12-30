@@ -94,7 +94,7 @@ def extend_books_with_new_list_of_books(books, result):
             result += extend_result
             if extend_result.startswith(EXTEND_SUCCESS):
                 books = get_books()
-                extend_books_with_new_list_of_books(books, result)
+                result += extend_books_with_new_list_of_books(books, result)
                 break
     return result
 
