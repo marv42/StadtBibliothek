@@ -101,7 +101,7 @@ def extend_books_with_new_list_of_books(books, result):
 
 def try_extend_book(book, number_of_book):
     name_and_author = get_name_and_author(book)
-    if "Verlängern" in book[3]:
+    if "target=verl_" in book[3]:
         extend(number_of_book)
         return f"{EXTEND_SUCCESS}: {name_and_author}\n"
     else:
