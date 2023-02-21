@@ -54,6 +54,7 @@ def get_books():
     for td in all_tds:
         match = re.search(r'>(.*)</td>', str(td))
         content = match.group(1)
+        content = content.encode("ISO-8859-1").decode("UTF-8")
         one_book.append(content)
         if len(one_book) == 4:
             list_of_books.append(one_book)
