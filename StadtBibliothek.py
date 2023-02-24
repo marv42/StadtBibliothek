@@ -92,7 +92,8 @@ def extend_books_with_new_list_of_books(books, result):
         day_of_book = get_first_date(books[b])
         if is_in_less_than_x_days(day_of_book, WARN_DAYS_IN_ADVANCE):
             extend_result = try_extend_book(books[b], b + 1)
-            result += extend_result
+            if extend_result not in result:
+                result += extend_result
             if extend_result.startswith(EXTEND_SUCCESS):
                 books = get_books()
                 result = extend_books_with_new_list_of_books(books, result)
