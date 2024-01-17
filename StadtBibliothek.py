@@ -129,7 +129,10 @@ def list_books(books):
 
 def main():
     logging.basicConfig(level=DEBUG)
-    retrieve_cookies()
+    try:
+        retrieve_cookies()
+    except requests.exceptions.ConnectionError as e:
+        send_mail("Stadtbibliothek nicht erreichbar", str(e.args))
     books = get_books()
     first_date = get_first_date(books)
     if first_date and is_in_less_than_x_days(first_date, WARN_DAYS_IN_ADVANCE):
