@@ -3,6 +3,6 @@ certifi==2023.11.17
 chardet==4.0.0
 idna==3.7
 lxml==5.1.0
-requests==2.31.0
+requests==2.32.0
 soupsieve==2.2.1
 urllib3==2.1.0
